@@ -13,7 +13,7 @@ stdenv.mkDerivation rec {
   buildInputs = [ coreutils ]; # bin/updatedb script needs to call sort
 
   # Since glibc-2.25 the i686 tests hang reliably right after test-sleep.
-  doCheck = !stdenv.isDarwin && (stdenv.system != "i686-linux");
+  doCheck = !stdenv.isDarwin && (stdenv.system != "i686-linux") && false;
 
   outputs = [ "out" "info" ];
 

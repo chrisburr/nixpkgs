@@ -2,8 +2,8 @@
 , pkgconfig, boehmgc, perlPackages, libsodium, aws-sdk-cpp, brotli, readline
 , autoreconfHook, autoconf-archive, bison, flex, libxml2, libxslt, docbook5, docbook5_xsl
 , libseccomp, busybox
-, storeDir ? "/nix/store"
-, stateDir ? "/nix/var"
+, storeDir ? "/cvmfs/lhcbdev.cern.ch/nix/v0.1/store"
+, stateDir ? "/cvmfs/lhcbdev.cern.ch/nix/v0.1/var"
 }:
 
 let

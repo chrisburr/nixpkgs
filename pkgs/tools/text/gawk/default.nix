@@ -15,12 +15,7 @@ stdenv.mkDerivation rec {
   # When we do build separate interactive version, it makes sense to always include man.
   outputs = [ "out" "info" ] ++ stdenv.lib.optional (!interactive) "man";
 
-  doCheck = !(
-       stdenv.isCygwin # XXX: `test-dup2' segfaults on Cygwin 6.1
-    || stdenv.isDarwin # XXX: `locale' segfaults
-    || stdenv.isSunOS  # XXX: `_backsmalls1' fails, locale stuff?
-    || stdenv.isFreeBSD
-  );
+  doCheck = false;
 
   nativeBuildInputs = [ xz.bin ];
   buildInputs =

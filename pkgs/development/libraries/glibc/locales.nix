@@ -26,7 +26,7 @@ callPackage ./common.nix { inherit stdenv; } {
   # $TMPDIR/nix/store/...-glibc-.../lib/locale/locale-archive.
   buildPhase =
     ''
-      mkdir -p $TMPDIR/"${stdenv.cc.libc.out}/lib/locale"
+      mkdir -p "$(cd "$TMPDIR/glibc-2.25/localedata" && I18NPATH=. GCONV_PATH="$TMPDIR/build/iconvdata" LC_ALL=C localedef --prefix="$TMPDIR" --alias-file=../intl/locale.alias -i locales/aa_DJ -c -f charmaps/UTF-8 aa_DJ.UTF-8 2>&1 | grep -oE "($TMPDIR"'/[^ :]+)')"
 
       # Hack to allow building of the locales (needed since glibc-2.12)
       sed -i -e 's,^$(rtld-prefix) $(common-objpfx)locale/localedef,localedef --prefix='$TMPDIR',' ../glibc-2*/localedata/Makefile

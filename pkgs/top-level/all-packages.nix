@@ -17041,6 +17041,8 @@ with pkgs;
 
   xnee = callPackage ../tools/X11/xnee { };
 
+  xrootd = callPackage ../applications/networking/xrootd {};
+
   xvidcap = callPackage ../applications/video/xvidcap {
     inherit (gnome2) scrollkeeper libglade;
   };
@@ -18769,8 +18771,8 @@ with pkgs;
   mynewt-newt = callPackage ../tools/package-management/mynewt-newt { };
 
   inherit (callPackages ../tools/package-management/nix {
-      storeDir = config.nix.storeDir or "/nix/store";
-      stateDir = config.nix.stateDir or "/nix/var";
+      storeDir = config.nix.storeDir or "/cvmfs/lhcbdev.cern.ch/nix/v0.1/store";
+      stateDir = config.nix.stateDir or "/cvmfs/lhcbdev.cern.ch/nix/v0.1/var";
       })
     nix
     nixStable

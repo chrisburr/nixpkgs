@@ -1,0 +1,104 @@
+diff --git a/bindings/CMakeLists.txt b/bindings/CMakeLists.txt
+index 4834bb35..13dbfbe7 100644
+--- a/bindings/CMakeLists.txt
++++ b/bindings/CMakeLists.txt
+@@ -1,4 +1,4 @@
+ 
+-if( BUILD_PYTHON )
++if( ENABLE_PYTHON AND (Linux OR APPLE) )
+   add_subdirectory( python )
+ endif()
+diff --git a/bindings/python/CMakeLists.txt b/bindings/python/CMakeLists.txt
+index 7ec8981d..a1270dc3 100644
+--- a/bindings/python/CMakeLists.txt
++++ b/bindings/python/CMakeLists.txt
+@@ -1,8 +1,6 @@
+ 
+ set(SETUP_PY_IN    "${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in")
+-set(SETUP_PY       "${CMAKE_CURRENT_BINARY_DIR}/setup.py")
+ set(DEPS           "${CMAKE_CURRENT_SOURCE_DIR}/libs/__init__.py")
+-set(OUTPUT         "${CMAKE_CURRENT_BINARY_DIR}/python_bindings")
+ set(XRD_SRCINCDIR  "${CMAKE_SOURCE_DIR}/src")
+ set(XRD_BININCDIR  "${CMAKE_BINARY_DIR}/src")
+ set(XRDCL_LIBDIR   "${CMAKE_BINARY_DIR}/src/XrdCl")
+@@ -15,16 +13,43 @@ if( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
+   endif()
+ endif()
+ 
+-configure_file(${SETUP_PY_IN} ${SETUP_PY})
++foreach(XRD_PY_VERSION IN ITEMS 2.7 3.4 3.5 3.6 3.7)
++  set(Python_ADDITIONAL_VERSIONS 2.7 3.4 3.5 3.6 3.7)
++  find_package( PythonInterp ${XRD_PY_VERSION} )
+ 
+-add_custom_command(OUTPUT ${OUTPUT}
+-                   COMMAND ${PYTHON_EXECUTABLE} ${SETUP_PY} build
+-                   DEPENDS ${DEPS})
++  if( PYTHONINTERP_FOUND )
++      find_package( PythonLibs )
+ 
+-add_custom_target(python_target ALL DEPENDS ${OUTPUT} XrdCl)
++      if( PYTHONLIBS_FOUND )
++        set(SETUP_PY       "${CMAKE_CURRENT_BINARY_DIR}/setup-${XRD_PY_VERSION}.py")
++        set(OUTPUT         "${CMAKE_CURRENT_BINARY_DIR}/python_bindings-${XRD_PY_VERSION}")
+ 
+-install(
+-  CODE
+-  "EXECUTE_PROCESS(
+-    COMMAND ${PYTHON_EXECUTABLE} ${SETUP_PY} install --prefix \$ENV{DESTDIR}/${CMAKE_INSTALL_PREFIX} --record PYTHON_INSTALLED)")
++        configure_file(${SETUP_PY_IN} ${SETUP_PY})
+ 
++        add_custom_command(OUTPUT ${OUTPUT}
++                           COMMAND ${PYTHON_EXECUTABLE} ${SETUP_PY} build
++                           DEPENDS ${DEPS})
++
++        MESSAGE( STATUS "Adding custom target: " "python_target_${XRD_PY_VERSION}" )
++        add_custom_target("python_target_${XRD_PY_VERSION}" ALL DEPENDS ${OUTPUT} XrdCl)
++
++        install(CODE "EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} ${SETUP_PY} install --prefix \$ENV{DESTDIR}/${CMAKE_INSTALL_PREFIX} --record PYTHON_INSTALLED)")
++
++        set( BUILD_PYTHON TRUE )
++        set( PYTHON_FOUND TRUE )
++      endif()
++  endif()
++
++  unset(PYTHON_DEBUG_LIBRARIES CACHE)
++  unset(PYTHONINTERP_FOUND CACHE)
++  unset(PYTHON_EXECUTABLE CACHE)
++  unset(PYTHON_VERSION_STRING CACHE)
++  unset(PYTHON_VERSION_MAJOR CACHE)
++  unset(PYTHON_VERSION_MINOR CACHE)
++  unset(PYTHON_VERSION_PATCH CACHE)
++  unset(PYTHON_INCLUDE_DIRS CACHE)
++  unset(PYTHON_LIBRARIES CACHE)
++  unset(PYTHON_MODULE_PREFIX CACHE)
++  unset(PYTHON_MODULE_EXTENSION CACHE)
++  unset(PYTHON_LIBRARY CACHE)
++endforeach(XRD_PY_VERSION)
+diff --git a/cmake/XRootDDefaults.cmake b/cmake/XRootDDefaults.cmake
+index 95545152..f79f73c3 100644
+--- a/cmake/XRootDDefaults.cmake
++++ b/cmake/XRootDDefaults.cmake
+@@ -19,4 +19,3 @@ define_default( ENABLE_TESTS    FALSE )
+ define_default( ENABLE_HTTP     TRUE )
+ define_default( ENABLE_CEPH     TRUE )
+ define_default( ENABLE_PYTHON   TRUE )
+-define_default( XRD_PYTHON_REQ_VERSION 2.4 )
+diff --git a/cmake/XRootDFindLibs.cmake b/cmake/XRootDFindLibs.cmake
+index b1e23550..8aa4ecc4 100644
+--- a/cmake/XRootDFindLibs.cmake
++++ b/cmake/XRootDFindLibs.cmake
+@@ -83,14 +83,3 @@ if( ENABLE_CEPH )
+     set( BUILD_CEPH FALSE )
+   endif()
+ endif()
+-
+-if( ENABLE_PYTHON AND (Linux OR APPLE) )
+-  find_package( PythonLibs ${XRD_PYTHON_REQ_VERSION} )
+-  find_package( PythonInterp ${XRD_PYTHON_REQ_VERSION} )
+-  if( PYTHONINTERP_FOUND AND PYTHONLIBS_FOUND )
+-    set( BUILD_PYTHON TRUE )
+-    set( PYTHON_FOUND TRUE )
+-  else()
+-    set( BUILD_PYTHON FALSE )
+-  endif()
+-endif()

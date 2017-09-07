@@ -190,6 +190,12 @@ in stdenv.mkDerivation {
         find $out -name "*.py" | $out/bin/python -m compileall -q -f -x "lib2to3" -i -
         find $out -name "*.py" | $out/bin/python -O -m compileall -q -f -x "lib2to3" -i -
         find $out -name "*.py" | $out/bin/python -OO -m compileall -q -f -x "lib2to3" -i -
+
+        # Set site-packages correctly so installed environments work
+        echo "from os.path import dirname, join, normpath, relpath" >> $out/lib/${libPrefix}/sitecustomize.py
+        echo "import site" >> $out/lib/${libPrefix}/sitecustomize.py
+        echo "import sys" >> $out/lib/${libPrefix}/sitecustomize.py
+        echo "site.addsitedir(normpath(join(dirname(sys.executable), '..', relpath(site.USER_SITE, site.USER_BASE))))" >> $out/lib/${libPrefix}/sitecustomize.py
       '' + optionalString hostPlatform.isCygwin ''
         cp libpython2.7.dll.a $out/lib
       '';

@@ -153,9 +153,11 @@ in rec {
 
   nixStable = (common rec {
     name = "nix-1.11.13";
-    src = fetchurl {
-      url = "http://nixos.org/releases/nix/${name}/${name}.tar.xz";
-      sha256 = "0913975e262f8069fde6e71a5fae757bb3aef558c51d1711034c525146ea5913";
+    src = fetchFromGitHub {
+      owner = "chrisburr";
+      repo = "nix";
+      rev = "33164f155a81c645e1813009b20f020b154263e3";
+      sha256 = "19dd593e812768f03f9bf9650bfe11a8bce62fe51cb11b4ed8ee6fbc7414017b";
     };
   }) // { perl-bindings = nixStable; };
 
@@ -163,10 +165,10 @@ in rec {
     name = "nix-1.12${suffix}";
     suffix = "pre5511_c94f3d55";
     src = fetchFromGitHub {
-      owner = "NixOS";
+      owner = "chrisburr";
       repo = "nix";
-      rev = "c94f3d5575d7af5403274d1e9e2f3c9d72989751";
-      sha256 = "1akfzzm4f07wj6l7za916xv5rnh71pk3vl8dphgradjfqb37bv18";
+      rev = "33164f155a81c645e1813009b20f020b154263e3";
+      sha256 = "19dd593e812768f03f9bf9650bfe11a8bce62fe51cb11b4ed8ee6fbc7414017b";
     };
     fromGit = true;
   })) // { perl-bindings = perl-bindings { nix = nixUnstable; }; };

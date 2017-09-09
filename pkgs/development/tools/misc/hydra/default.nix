@@ -67,10 +67,10 @@ in releaseTools.nixBuild rec {
   inherit stdenv;
 
   src = fetchFromGitHub {
-    owner = "NixOS";
+    owner = "chrisburr";
     repo = "hydra";
-    rev = "3fc320db320c9aa5180c54e77513f1bcb7407079";
-    sha256 = "0kml2rvy5pz8pzl23vfib5vrwxccff9j1jmyq926qv7f5kbzy61b";
+    rev = "b57b2e8461e2155bb4664ec088d75a73134d4e91";
+    sha256 = "f5a7b052667197d7b50a2e9ae73a82fb79b6af625dad5f348a871565e0b57c17";
   };
 
   buildInputs =

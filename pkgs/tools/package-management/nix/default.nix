@@ -152,13 +152,14 @@ in rec {
   nix = nixStable;
 
   nixStable = (common rec {
-    name = "nix-1.11.13";
+    name = "nix-1.11.14";
     src = fetchFromGitHub {
       owner = "chrisburr";
       repo = "nix";
-      rev = "33164f155a81c645e1813009b20f020b154263e3";
-      sha256 = "19dd593e812768f03f9bf9650bfe11a8bce62fe51cb11b4ed8ee6fbc7414017b";
+      rev = "f3fc4e44fa34911f0b334eedb3973cead4d3a587";
+      sha256 = "e18fcd891dfa2c87ff0c0e51d57fbe5af6c783cf7cc89e50ee7990483b163bfa";
     };
+    fromGit = true;
   }) // { perl-bindings = nixStable; };
 
   nixUnstable = (lib.lowPrio (common rec {
@@ -167,8 +168,8 @@ in rec {
     src = fetchFromGitHub {
       owner = "chrisburr";
       repo = "nix";
-      rev = "33164f155a81c645e1813009b20f020b154263e3";
-      sha256 = "19dd593e812768f03f9bf9650bfe11a8bce62fe51cb11b4ed8ee6fbc7414017b";
+      rev = "d3d7ef2614a2639968de675bc8e4927a48435020";
+      sha256 = "962372e86cba3b8bfd3545933c0df3913718c34c7c2ee731f16170478ea6427e";
     };
     fromGit = true;
   })) // { perl-bindings = perl-bindings { nix = nixUnstable; }; };

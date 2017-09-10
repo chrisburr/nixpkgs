@@ -1,6 +1,7 @@
-{ stdenv, fetchurl, fetchpatch, cmake, pcre, pkgconfig, python2
+{ stdenv, fetchurl, fetchpatch, cmake, pcre, pkgconfig, python2, python36
 , libX11, libXpm, libXft, libXext, mesa, zlib, libxml2, lzma, gsl
-, Cocoa, OpenGL }:
+, Cocoa, OpenGL, xrootd, fftw, postgresql, mysql, sqlite, gfortran
+, openssl, graphviz, openldap, cfitsio, ftgl, tbb }:
 
 stdenv.mkDerivation rec {
   name = "root-${version}";
@@ -11,7 +12,9 @@ stdenv.mkDerivation rec {
     sha256 = "0nwg4bw02v6vahm2rwfaj7fzp3ffhjg5jk7h20il4246swhxw6s6";
   };
 
-  buildInputs = [ cmake pcre pkgconfig python2 zlib libxml2 lzma gsl ]
+  buildInputs = [ cmake pcre pkgconfig python2 python36 zlib libxml2 lzma gsl xrootd
+                  fftw postgresql mysql sqlite gfortran openssl tbb
+                  graphviz openldap cfitsio ftgl ]
     ++ stdenv.lib.optionals (!stdenv.isDarwin) [ libX11 libXpm libXft libXext mesa ]
     ++ stdenv.lib.optionals (stdenv.isDarwin) [ Cocoa OpenGL ]
     ;
@@ -24,6 +27,9 @@ stdenv.mkDerivation rec {
 
     # https://sft.its.cern.ch/jira/browse/ROOT-8728
     ./ROOT-8728-extra.patch
+
+    # Patch ROOT to simultaneously support multiple python versions
+    ./many_python_versions.patch
   ];
 
   preConfigure = ''
@@ -40,28 +46,29 @@ stdenv.mkDerivation rec {
     "-Dchirp=OFF"
     "-Ddavix=OFF"
     "-Ddcache=OFF"
-    "-Dfftw3=OFF"
-    "-Dfitsio=OFF"
-    "-Dfortran=OFF"
-    "-Dimt=OFF"
+    "-Dfftw3=ON"
+    "-Dfitsio=ON"
+    "-Dfortran=ON"
+    "-Dimt=ON"
     "-Dgfal=OFF"
-    "-Dgviz=OFF"
+    "-Dgviz=ON"
     "-Dhdfs=OFF"
     "-Dkrb5=OFF"
-    "-Dldap=OFF"
+    "-Dldap=ON"
     "-Dmonalisa=OFF"
-    "-Dmysql=OFF"
+    "-Dmysql=ON"
     "-Dodbc=OFF"
     "-Dopengl=ON"
     "-Doracle=OFF"
-    "-Dpgsql=OFF"
+    "-Dpgsql=ON"
     "-Dpythia6=OFF"
     "-Dpythia8=OFF"
     "-Drfio=OFF"
-    "-Dsqlite=OFF"
-    "-Dssl=OFF"
+    "-Dsqlite=ON"
+    "-Dssl=ON"
     "-Dxml=ON"
-    "-Dxrootd=OFF"
+    "-Dxrootd=ON"
+    "-Dfail-on-missing=ON"
   ]
   ++ stdenv.lib.optional (stdenv.cc.libc != null) "-DC_INCLUDE_DIRS=${stdenv.lib.getDev stdenv.cc.libc}/include"
   ++ stdenv.lib.optional stdenv.isDarwin "-DOPENGL_INCLUDE_DIR=${OpenGL}/Library/Frameworks";

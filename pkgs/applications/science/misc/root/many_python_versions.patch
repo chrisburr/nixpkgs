@@ -1,0 +1,225 @@
+diff --git a/bindings/pyroot/CMakeLists.txt b/bindings/pyroot/CMakeLists.txt
+index e07a61f555..40263b49e0 100644
+--- a/bindings/pyroot/CMakeLists.txt
++++ b/bindings/pyroot/CMakeLists.txt
+@@ -1,58 +1,108 @@
+ ############################################################################
+ # CMakeLists.txt file for building ROOT bindings/pyroot package
+ ############################################################################
++macro(install_symlink filepath destdir destname)
++    install(CODE "execute_process( \
++      COMMAND ${CMAKE_COMMAND} -E make_directory ${destdir} \
++      COMMAND ${CMAKE_COMMAND} -E create_symlink ${filepath} ${destdir}/${destname})")
++    install(CODE "message(\"-- Created symlink: ${destdir}/${destname} -> ${filepath}\")")
++endmacro(install_symlink)
++
+ include_directories(${PYTHON_INCLUDE_DIRS})
+ 
+-ROOT_GENERATE_DICTIONARY(G__PyROOT *.h MODULE PyROOT LINKDEF LinkDef.h OPTIONS "-writeEmptyRootPCM")
++#---Check for Python installation-------------------------------------------------------
++if(python OR python3)
++  foreach(ROOT_PY_VERSION IN ITEMS 2.7 3.4 3.5 3.6 3.7)
++    message(STATUS "Looking for Python ${ROOT_PY_VERSION}")
++    set(Python_ADDITIONAL_VERSIONS ${ROOT_PY_VERSION})
++    find_package( PythonInterp ${ROOT_PY_VERSION} )
+ 
+-ROOT_ADD_CXX_FLAG(CMAKE_CXX_FLAGS -fno-strict-aliasing)
+-ROOT_ADD_CXX_FLAG(CMAKE_CXX_FLAGS -Wno-parentheses-equality)
++    if(PYTHONINTERP_FOUND)
++      if(${ROOT_PY_VERSION} MATCHES ${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR})
+ 
+-if(WIN32)
+-  set(ROOTULIBS -include:_G__cpp_setupG__Net
+-                -include:_G__cpp_setupG__IO
+-                -include:_G__cpp_setupG__Tree
+-                -include:_G__cpp_setupG__Thread
+-                -include:_G__cpp_setupG__MathCore)
+-endif()
+-ROOT_LINKER_LIBRARY(PyROOT *.cxx G__PyROOT.cxx LIBRARIES Core Net Tree MathCore Rint ${PYTHON_LIBRARIES})
+-ROOT_LINKER_LIBRARY(JupyROOT ../JupyROOT/src/*.cxx LIBRARIES Core)
+-
+-
+-if(MSVC)
+-  add_custom_command(TARGET PyROOT POST_BUILD
+-                     COMMAND link -dll -nologo -IGNORE:4001 -machine:ix86 -export:initlibPyROOT
+-                    $<TARGET_LINKER_FILE:PyROOT> -nodefaultlib kernel32.lib msvcrt.lib
+-                    -out:$<TARGET_FILE_DIR:PyROOT>/libPyROOT.pyd)
+-  install(FILES  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/libPyROOT.pyd
+-                 DESTINATION ${CMAKE_INSTALL_BINDIR}
+-                 COMPONENT libraries)
+-endif()
+-if(MACOSX_MINOR EQUAL 5)
+-  ROOT_EXECUTABLE(python64 python64.c LIBRARIES  ${PYTHON_LIBRARIES})
+-endif()
++        find_package(PythonLibs)
++        if(PYTHONLIBS_FOUND)
++          if(IS_ABSOLUTE ${runtimedir}/python${ROOT_PY_VERSION}/site-packages)
++            set(absruntimedir ${runtimedir}/python${ROOT_PY_VERSION}/site-packages)
++          else()
++            set(absruntimedir \${CMAKE_INSTALL_PREFIX}/${runtimedir}/python${ROOT_PY_VERSION}/site-packages)
++          endif()
++
++          include_directories(${PYTHON_INCLUDE_DIRS})
++          ROOT_GENERATE_DICTIONARY(G__PyROOT-${ROOT_PY_VERSION} *.h MODULE PyROOT-${ROOT_PY_VERSION} LINKDEF LinkDef.h OPTIONS "-writeEmptyRootPCM")
++
++          ROOT_ADD_CXX_FLAG(CMAKE_CXX_FLAGS -fno-strict-aliasing)
++          ROOT_ADD_CXX_FLAG(CMAKE_CXX_FLAGS -Wno-parentheses-equality)
++
++          if(WIN32)
++            set(ROOTULIBS -include:_G__cpp_setupG__Net
++                          -include:_G__cpp_setupG__IO
++                          -include:_G__cpp_setupG__Tree
++                          -include:_G__cpp_setupG__Thread
++                          -include:_G__cpp_setupG__MathCore)
++          endif()
++          ROOT_LINKER_LIBRARY(PyROOT-${ROOT_PY_VERSION} *.cxx G__PyROOT-${ROOT_PY_VERSION}.cxx LIBRARIES Core Net Tree MathCore Rint ${PYTHON_LIBRARIES})
++          install_symlink($<TARGET_FILE:PyROOT-${ROOT_PY_VERSION}> ${absruntimedir}/python${ROOT_PY_VERSION}/site-packages libPyROOT.so)
+ 
+-#---Install python modules--------------------------------------------------
+-file(GLOB pyfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.py)
+-foreach(pyfile ${pyfiles})
+-  install(FILES ${pyfile} DESTINATION ${runtimedir})
+-  if(IS_ABSOLUTE ${runtimedir})
+-    set(absruntimedir ${runtimedir})
+-  else()
+-    set(absruntimedir \${CMAKE_INSTALL_PREFIX}/${runtimedir})
+-  endif()
+-  install(CODE "execute_process(COMMAND ${PYTHON_EXECUTABLE} -m py_compile \$ENV{DESTDIR}${absruntimedir}/${pyfile})")
+-  install(CODE "execute_process(COMMAND ${PYTHON_EXECUTABLE} -O -m py_compile \$ENV{DESTDIR}${absruntimedir}/${pyfile})")
+-  file(COPY ${pyfile} DESTINATION ${localruntimedir})
+-endforeach()
+-
+-set(JupyROOTDirName "JupyROOT")
+-install (DIRECTORY ${JupyROOTDirName} DESTINATION ${runtimedir})
+-file(COPY ${JupyROOTDirName} DESTINATION ${localruntimedir})
+-
+-set( JsMVADirName "JsMVA")
+-install (DIRECTORY ${JsMVADirName} DESTINATION ${runtimedir})
+-file(COPY ${JsMVADirName} DESTINATION ${localruntimedir})
++          ROOT_LINKER_LIBRARY(JupyROOT-${ROOT_PY_VERSION} ../JupyROOT/src/*.cxx LIBRARIES Core)
++          install_symlink($<TARGET_FILE:JupyROOT-${ROOT_PY_VERSION}> ${absruntimedir}/python${ROOT_PY_VERSION}/site-packages libJupyROOT.so)
++
++          if(MSVC)
++            add_custom_command(TARGET PyROOT-${ROOT_PY_VERSION} POST_BUILD
++                               COMMAND link -dll -nologo -IGNORE:4001 -machine:ix86 -export:initlibPyROOT
++                              $<TARGET_LINKER_FILE:PyROOT-${ROOT_PY_VERSION}> -nodefaultlib kernel32.lib msvcrt.lib
++                              -out:$<TARGET_FILE_DIR:PyROOT-${ROOT_PY_VERSION}>/libPyROOT.pyd)
++            install(FILES  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/libPyROOT.pyd
++                           DESTINATION ${CMAKE_INSTALL_BINDIR}
++                           COMPONENT libraries)
++          endif()
++          if(MACOSX_MINOR EQUAL 5)
++            ROOT_EXECUTABLE(python64 python64.c LIBRARIES  ${PYTHON_LIBRARIES})
++          endif()
++
++          #---Install python modules--------------------------------------------------
++          file(GLOB pyfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.py)
++          foreach(pyfile ${pyfiles})
++            install(FILES ${pyfile} DESTINATION ${runtimedir}/python${ROOT_PY_VERSION}/site-packages)
++            install(CODE "execute_process(COMMAND ${PYTHON_EXECUTABLE} -m py_compile \$ENV{DESTDIR}${absruntimedir}/${pyfile})")
++            install(CODE "execute_process(COMMAND ${PYTHON_EXECUTABLE} -O -m py_compile \$ENV{DESTDIR}${absruntimedir}/${pyfile})")
++            file(COPY ${pyfile} DESTINATION ${localruntimedir}/python${ROOT_PY_VERSION}/site-packages)
++          endforeach()
++
++          set(JupyROOTDirName "JupyROOT")
++          install (DIRECTORY ${JupyROOTDirName} DESTINATION ${runtimedir}/python${ROOT_PY_VERSION}/site-packages)
++          file(COPY ${JupyROOTDirName} DESTINATION ${localruntimedir}/python${ROOT_PY_VERSION}/site-packages)
++
++          set( JsMVADirName "JsMVA")
++          install (DIRECTORY ${JsMVADirName} DESTINATION ${runtimedir}/python${ROOT_PY_VERSION}/site-packages)
++          file(COPY ${JsMVADirName} DESTINATION ${localruntimedir}/python${ROOT_PY_VERSION}/site-packages)
++
++        endif()
++      endif()
++    endif()
++
++    # Clean up so we can search for more python versions
++    unset(PYTHON_DEBUG_LIBRARIES CACHE)
++    unset(PYTHONINTERP_FOUND CACHE)
++    unset(PYTHON_EXECUTABLE CACHE)
++    unset(PYTHON_VERSION_STRING CACHE)
++    unset(PYTHON_VERSION_MAJOR CACHE)
++    unset(PYTHON_VERSION_MINOR CACHE)
++    unset(PYTHON_VERSION_PATCH CACHE)
++    unset(PYTHON_INCLUDE_DIRS CACHE)
++    unset(PYTHON_LIBRARIES CACHE)
++    unset(PYTHON_MODULE_PREFIX CACHE)
++    unset(PYTHON_MODULE_EXTENSION CACHE)
++    unset(PYTHON_LIBRARY CACHE)
++    unset(NUMPY_FOUND CACHE)
++    unset(NUMPY_VERSION CACHE)
++    unset(NUMPY_VERSION_MAJOR CACHE)
++    unset(NUMPY_VERSION_MINOR CACHE)
++    unset(NUMPY_VERSION_PATCH CACHE)
++    unset(NUMPY_VERSION_DECIMAL CACHE)
++    unset(NUMPY_INCLUDE_DIRS CACHE)
++  endforeach(ROOT_PY_VERSION)
++endif()
+ 
+ #---Install headers----------------------------------------------------------
+ ROOT_INSTALL_HEADERS()
+diff --git a/cmake/modules/SearchInstalledSoftware.cmake b/cmake/modules/SearchInstalledSoftware.cmake
+index 9f0f433dc8..26a1ab1818 100644
+--- a/cmake/modules/SearchInstalledSoftware.cmake
++++ b/cmake/modules/SearchInstalledSoftware.cmake
+@@ -413,33 +413,33 @@ if(mathmore OR builtin_gsl)
+ endif()
+ 
+ 
+-#---Check for Python installation-------------------------------------------------------
+-if(python OR python3)
+-  message(STATUS "Looking for Python")
+-  #---First look for the python interpreter and fix the version of it for the libraries--
+-  if(python3)
+-    find_package(PythonInterp 3.5)
+-  else()
+-    find_package(PythonInterp)
+-  endif()
+-  if(PYTHONINTERP_FOUND)
+-    execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys;sys.stdout.write(sys.version[:3])"
+-                    OUTPUT_VARIABLE PYTHON_VERSION)
+-    message(STATUS "Found Python interpreter version ${PYTHON_VERSION}")
+-  endif()
+-  set(Python_ADDITIONAL_VERSIONS ${PYTHON_VERSION})
+-  find_package(PythonLibs)
+-  if(NOT PYTHONLIBS_FOUND)
+-    if(fail-on-missing)
+-      message(FATAL_ERROR "PythonLibs package not found and python component required")
+-    else()
+-      set(python OFF CACHE BOOL "" FORCE)
+-      message(STATUS "Python not found. Switching off python option")
+-    endif()
+-  else()
+-  endif()
+-  find_package(NumPy)
+-endif()
++# #---Check for Python installation-------------------------------------------------------
++# if(python OR python3)
++#   message(STATUS "Looking for Python")
++#   #---First look for the python interpreter and fix the version of it for the libraries--
++#   if(python3)
++#     find_package(PythonInterp 3.5)
++#   else()
++#     find_package(PythonInterp)
++#   endif()
++#   if(PYTHONINTERP_FOUND)
++#     execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys;sys.stdout.write(sys.version[:3])"
++#                     OUTPUT_VARIABLE PYTHON_VERSION)
++#     message(STATUS "Found Python interpreter version ${PYTHON_VERSION}")
++#   endif()
++#   set(Python_ADDITIONAL_VERSIONS ${PYTHON_VERSION})
++#   find_package(PythonLibs)
++#   if(NOT PYTHONLIBS_FOUND)
++#     if(fail-on-missing)
++#       message(FATAL_ERROR "PythonLibs package not found and python component required")
++#     else()
++#       set(python OFF CACHE BOOL "" FORCE)
++#       message(STATUS "Python not found. Switching off python option")
++#     endif()
++#   else()
++#   endif()
++#   find_package(NumPy)
++# endif()
+ 
+ #---Check for Ruby installation-------------------------------------------------------
+ if(ruby)

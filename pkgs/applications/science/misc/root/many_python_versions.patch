@@ -1,8 +1,8 @@
 diff --git a/bindings/pyroot/CMakeLists.txt b/bindings/pyroot/CMakeLists.txt
-index e07a61f555..40263b49e0 100644
+index e07a61f555..a7f7eb6af3 100644
 --- a/bindings/pyroot/CMakeLists.txt
 +++ b/bindings/pyroot/CMakeLists.txt
-@@ -1,58 +1,108 @@
+@@ -1,58 +1,101 @@
  ############################################################################
  # CMakeLists.txt file for building ROOT bindings/pyroot package
  ############################################################################
@@ -73,7 +73,7 @@ index e07a61f555..40263b49e0 100644
 +                          -include:_G__cpp_setupG__MathCore)
 +          endif()
 +          ROOT_LINKER_LIBRARY(PyROOT-${ROOT_PY_VERSION} *.cxx G__PyROOT-${ROOT_PY_VERSION}.cxx LIBRARIES Core Net Tree MathCore Rint ${PYTHON_LIBRARIES})
-+          install_symlink($<TARGET_FILE:PyROOT-${ROOT_PY_VERSION}> ${absruntimedir}/python${ROOT_PY_VERSION}/site-packages libPyROOT.so)
++          install_symlink(../../libPyROOT-${ROOT_PY_VERSION}.so ${absruntimedir} libPyROOT.so)
  
 -#---Install python modules--------------------------------------------------
 -file(GLOB pyfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.py)
@@ -97,7 +97,7 @@ index e07a61f555..40263b49e0 100644
 -install (DIRECTORY ${JsMVADirName} DESTINATION ${runtimedir})
 -file(COPY ${JsMVADirName} DESTINATION ${localruntimedir})
 +          ROOT_LINKER_LIBRARY(JupyROOT-${ROOT_PY_VERSION} ../JupyROOT/src/*.cxx LIBRARIES Core)
-+          install_symlink($<TARGET_FILE:JupyROOT-${ROOT_PY_VERSION}> ${absruntimedir}/python${ROOT_PY_VERSION}/site-packages libJupyROOT.so)
++          install_symlink(../../libJupyROOT-${ROOT_PY_VERSION}.so ${absruntimedir} libJupyROOT.so)
 +
 +          if(MSVC)
 +            add_custom_command(TARGET PyROOT-${ROOT_PY_VERSION} POST_BUILD
@@ -146,13 +146,6 @@ index e07a61f555..40263b49e0 100644
 +    unset(PYTHON_MODULE_PREFIX CACHE)
 +    unset(PYTHON_MODULE_EXTENSION CACHE)
 +    unset(PYTHON_LIBRARY CACHE)
-+    unset(NUMPY_FOUND CACHE)
-+    unset(NUMPY_VERSION CACHE)
-+    unset(NUMPY_VERSION_MAJOR CACHE)
-+    unset(NUMPY_VERSION_MINOR CACHE)
-+    unset(NUMPY_VERSION_PATCH CACHE)
-+    unset(NUMPY_VERSION_DECIMAL CACHE)
-+    unset(NUMPY_INCLUDE_DIRS CACHE)
 +  endforeach(ROOT_PY_VERSION)
 +endif()
  

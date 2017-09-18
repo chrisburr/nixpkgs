@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, fetchpatch, cmake, pcre, pkgconfig, python2, python36
+{ stdenv, fetchurl, fetchpatch, cmake, pcre, pkgconfig, python
 , libX11, libXpm, libXft, libXext, mesa, zlib, libxml2, lzma, gsl
 , Cocoa, OpenGL, xrootd, fftw, postgresql, mysql, sqlite, gfortran
 , openssl, graphviz, openldap, cfitsio, ftgl, tbb }:
@@ -12,7 +12,7 @@ stdenv.mkDerivation rec {
     sha256 = "0nwg4bw02v6vahm2rwfaj7fzp3ffhjg5jk7h20il4246swhxw6s6";
   };
 
-  buildInputs = [ cmake pcre pkgconfig python2 python36 zlib libxml2 lzma gsl xrootd
+  buildInputs = [ cmake pcre pkgconfig python zlib libxml2 lzma gsl xrootd
                   fftw postgresql mysql sqlite gfortran openssl tbb
                   graphviz openldap cfitsio ftgl ]
     ++ stdenv.lib.optionals (!stdenv.isDarwin) [ libX11 libXpm libXft libXext mesa ]
@@ -27,9 +27,6 @@ stdenv.mkDerivation rec {
 
     # https://sft.its.cern.ch/jira/browse/ROOT-8728
     ./ROOT-8728-extra.patch
-
-    # Patch ROOT to simultaneously support multiple python versions
-    ./many_python_versions.patch
   ];
 
   preConfigure = ''
@@ -69,6 +66,7 @@ stdenv.mkDerivation rec {
     "-Dxml=ON"
     "-Dxrootd=ON"
     "-Dfail-on-missing=ON"
+    "-Dpython3=${if python ? isPy3 then "ON" else "OFF"}"
   ]
   ++ stdenv.lib.optional (stdenv.cc.libc != null) "-DC_INCLUDE_DIRS=${stdenv.lib.getDev stdenv.cc.libc}/include"
   ++ stdenv.lib.optional stdenv.isDarwin "-DOPENGL_INCLUDE_DIR=${OpenGL}/Library/Frameworks";

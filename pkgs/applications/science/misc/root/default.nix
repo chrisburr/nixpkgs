@@ -12,6 +12,8 @@ stdenv.mkDerivation rec {
     sha256 = "0nwg4bw02v6vahm2rwfaj7fzp3ffhjg5jk7h20il4246swhxw6s6";
   };
 
+  outputs = [ "out" "pythonlib" ];
+
   buildInputs = [ cmake pcre pkgconfig python zlib libxml2 lzma gsl xrootd
                   fftw postgresql mysql sqlite gfortran openssl tbb
                   graphviz openldap cfitsio ftgl ]
@@ -73,9 +75,28 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
+  postInstall =
+    ''
+      mkdir -p $pythonlib/lib/python${python.majorVersion}/site-packages
+      ln -s $out/lib/cmdLineUtils.py $pythonlib/lib/python${python.majorVersion}/site-packages
+      ln -s $out/lib/cppyy.py $pythonlib/lib/python${python.majorVersion}/site-packages
+      ln -s $out/lib/libJupyROOT.so $pythonlib/lib/python${python.majorVersion}/site-packages
+      ln -s $out/lib/_pythonization.py $pythonlib/lib/python${python.majorVersion}/site-packages
+      ln -s $out/lib/ROOT.py $pythonlib/lib/python${python.majorVersion}/site-packages
+      ln -s $out/lib/JupyROOT $pythonlib/lib/python${python.majorVersion}/site-packages
+      ln -s $out/lib/libPyMVA_rdict.pcm $pythonlib/lib/python${python.majorVersion}/site-packages
+      ln -s $out/lib/libPyMVA.rootmap $pythonlib/lib/python${python.majorVersion}/site-packages
+      ln -s $out/lib/libPyMVA.so $pythonlib/lib/python${python.majorVersion}/site-packages
+      ln -s $out/lib/libPyROOT_rdict.pcm $pythonlib/lib/python${python.majorVersion}/site-packages
+      ln -s $out/lib/libPyROOT.rootmap $pythonlib/lib/python${python.majorVersion}/site-packages
+      ln -s $out/lib/libPyROOT.so $pythonlib/lib/python${python.majorVersion}/site-packages
+    '';
+
   setupHook = ./setup-hook.sh;
 
   meta = {
+    outputsToInstall = outputs;
+
     homepage = https://root.cern.ch/;
     description = "A data analysis framework";
     platforms = stdenv.lib.platforms.unix;

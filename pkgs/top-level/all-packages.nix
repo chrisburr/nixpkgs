@@ -5260,6 +5260,8 @@ with pkgs;
 
   clean = callPackage ../development/compilers/clean { };
 
+  aida = callPackage ../development/libraries/aida {};
+
   clhep = callPackage ../development/libraries/clhep {};
 
   heppdt = callPackage ../development/libraries/heppdt {};

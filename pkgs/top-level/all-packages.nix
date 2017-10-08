@@ -5262,6 +5262,8 @@ with pkgs;
 
   clhep = callPackage ../development/libraries/clhep {};
 
+  heppdt = callPackage ../development/libraries/heppdt {};
+
   closurecompiler = callPackage ../development/compilers/closure { };
 
   cmdstan = callPackage ../development/compilers/cmdstan { };

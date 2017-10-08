@@ -150,7 +150,10 @@ in stdenv.mkDerivation {
     echo "from os.path import dirname, join, normpath, relpath" >> $out/lib/${libPrefix}/sitecustomize.py
     echo "import site" >> $out/lib/${libPrefix}/sitecustomize.py
     echo "import os" >> $out/lib/${libPrefix}/sitecustomize.py
-    echo "site.addsitedir(normpath(join(os.environ['LHCB_NIX_ENV_DIR'], relpath(site.USER_SITE, site.USER_BASE))))" >> $out/lib/${libPrefix}/sitecustomize.py
+    echo "try:" >> $out/lib/${libPrefix}/sitecustomize.py
+    echo "    site.addsitedir(normpath(join(os.environ['LHCB_NIX_ENV_DIR'], relpath(site.USER_SITE, site.USER_BASE))))" >> $out/lib/${libPrefix}/sitecustomize.py
+    echo "except KeyError:" >> $out/lib/${libPrefix}/sitecustomize.py
+    echo "    print('WARNING: \"LHCB_NIX_ENV_DIR\" is not set')" >> $out/lib/${libPrefix}/sitecustomize.py
   '';
 
   passthru = let

@@ -198,7 +198,7 @@ in stdenv.mkDerivation {
         echo "try:" >> $out/lib/${libPrefix}/sitecustomize.py
         echo "    site.addsitedir(normpath(join(os.environ['LHCB_NIX_ENV_DIR'], relpath(site.USER_SITE, site.USER_BASE))))" >> $out/lib/${libPrefix}/sitecustomize.py
         echo "except KeyError:" >> $out/lib/${libPrefix}/sitecustomize.py
-        echo "    print('WARNING: \"LHCB_NIX_ENV_DIR\" is not set')" >> $out/lib/${libPrefix}/sitecustomize.py
+        echo "    pass" >> $out/lib/${libPrefix}/sitecustomize.py
       '' + optionalString hostPlatform.isCygwin ''
         cp libpython2.7.dll.a $out/lib
       '';

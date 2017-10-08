@@ -9,7 +9,7 @@ in stdenv.mkDerivation {
   src = fetchgit {
     url = "https://gitlab.cern.ch/CLHEP/CLHEP.git";
     rev = "9e3dd671d22c535c2b373479be333ef0aa89af7f";
-    sha256 = "ffefabe17240bfb452f382e4124b48e10b4892066df52617864baf33a8e74d2f";
+    sha256 = "0l8zdhvidbcix839556mh5xazqri4h2xzskmjgbsa14npnkz9sbh";
   };
 
   preConfigure = ''

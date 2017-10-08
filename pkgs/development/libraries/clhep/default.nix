@@ -1,4 +1,4 @@
-{ stdenv, fetchgit }:
+{ stdenv, fetchgit, cmake }:
 
 let
   version = "2.3.4.5";
@@ -12,9 +12,7 @@ in stdenv.mkDerivation {
     sha256 = "0l8zdhvidbcix839556mh5xazqri4h2xzskmjgbsa14npnkz9sbh";
   };
 
-  preConfigure = ''
-    ./bootstrap
-  '';
+  buildInputs = [ cmake ];
 
   # TODO Run tests
 

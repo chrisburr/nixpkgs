@@ -5260,6 +5260,8 @@ with pkgs;
 
   clean = callPackage ../development/compilers/clean { };
 
+  clhep = callPackage ../development/libraries/clhep {};
+
   closurecompiler = callPackage ../development/compilers/closure { };
 
   cmdstan = callPackage ../development/compilers/cmdstan { };

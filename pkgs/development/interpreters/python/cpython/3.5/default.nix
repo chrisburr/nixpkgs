@@ -147,8 +147,8 @@ in stdenv.mkDerivation {
     # Set site-packages correctly so installed environments work
     echo "from os.path import dirname, join, normpath, relpath" >> $out/lib/${libPrefix}/sitecustomize.py
     echo "import site" >> $out/lib/${libPrefix}/sitecustomize.py
-    echo "import sys" >> $out/lib/${libPrefix}/sitecustomize.py
-    echo "site.addsitedir(normpath(join(dirname(sys.executable), '..', relpath(site.USER_SITE, site.USER_BASE))))" >> $out/lib/${libPrefix}/sitecustomize.py
+    echo "import os" >> $out/lib/${libPrefix}/sitecustomize.py
+    echo "site.addsitedir(normpath(join(os.environ['LHCB_NIX_ENV_DIR'], relpath(site.USER_SITE, site.USER_BASE))))" >> $out/lib/${libPrefix}/sitecustomize.py
   '';
 
   passthru = let

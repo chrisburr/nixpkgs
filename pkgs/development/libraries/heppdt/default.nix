@@ -1,4 +1,4 @@
-{ stdenv, fetchurl }:
+{ stdenv, fetchurl, automake, autoconf, ghostscript }:
 
 let
   version = "3.04.01";
@@ -11,6 +11,12 @@ in stdenv.mkDerivation {
     url = "http://lcgapp.cern.ch/project/simu/HepPDT/download/HepPDT-${version}.tar.gz";
     sha256 = "1xn0ccpp4pgxbxr7pqydy31mpd8wifiz3lz0d7nksp99j7mkj71c";
   };
+
+  preConfigure = ''
+    ./bootstrap
+  '';
+
+  buildInputs = [ automake autoconf ghostscript ];
 
   enableParallelBuilding = true;
 

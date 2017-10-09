@@ -21276,6 +21276,53 @@ in {
     };
   };
 
+  ratelimiter = buildPythonPackage rec {
+    name = "ratelimiter-1.2.0";
+
+    # TODO Enable the tests?
+    doCheck = false;
+
+    src = pkgs.fetchurl {
+      url = "mirror://pypi/r/ratelimiter/${name}.tar.gz";
+      sha256 = "f724b256264afdeab0225ec174728b0f8af1afd1cc122463150daf226b411fb6";
+    };
+
+    meta = {
+      homepage = http://pypi.python.org/pypi/ratelimiter/;
+      description = "Simple Python module providing rate limiting";
+      license = licenses.asl20;
+    };
+  };
+
+  snakemake = buildPythonPackage rec {
+    name = "snakemake-4.1.0";
+
+    disabled = !isPy3k;
+
+    # TODO Enable the tests?
+    doCheck = false;
+
+    src = pkgs.fetchurl {
+      url = "mirror://pypi/s/snakemake/${name}.tar.gz";
+      sha256 = "0876797aeb633be7129ac943d9ff5643d491f9115a19484cbe8594c3e87912e5";
+    };
+
+    buildInputs = with self; [
+      self.wrapt
+      self.requests
+      self.ratelimiter
+      self.pyyaml
+      self.ConfigArgParse
+      self.appdirs
+    ];
+
+    meta = {
+      homepage = http://pypi.python.org/pypi/snakemake/;
+      description = "A workflow management engine";
+      license = licenses.mit;
+    };
+  };
+
   snowballstemmer = buildPythonPackage rec {
     name = "snowballstemmer-1.2.1";
 

@@ -1,7 +1,7 @@
 { stdenv, fetchurl, fetchpatch, cmake, pcre, pkgconfig, python
 , libX11, libXpm, libXft, libXext, mesa, zlib, libxml2, lzma, gsl
 , Cocoa, OpenGL, xrootd, fftw, postgresql, mysql, sqlite, gfortran
-, openssl, graphviz, openldap, cfitsio, ftgl, tbb }:
+, openssl, graphviz, openldap, cfitsio, ftgl, tbb, cxx_standard ? "cxx14" }:
 
 stdenv.mkDerivation rec {
   name = "root-${version}";
@@ -67,6 +67,9 @@ stdenv.mkDerivation rec {
     "-Dssl=ON"
     "-Dxml=ON"
     "-Dxrootd=ON"
+    "-Dcxx11=${if cxx_standard == "cxx11" then "ON" else "OFF"}"
+    "-Dcxx14=${if cxx_standard == "cxx14" then "ON" else "OFF"}"
+    "-Dcxx17=${if cxx_standard == "cxx17" then "ON" else "OFF"}"
     "-Dfail-on-missing=ON"
     "-Dpython3=${if python ? isPy3 then "ON" else "OFF"}"
   ]

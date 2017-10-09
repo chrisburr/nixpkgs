@@ -10028,11 +10028,11 @@ in {
 
   ConfigArgParse = buildPythonPackage rec {
     name = "ConfigArgParse-${version}";
-    version = "0.9.3";
+    version = "0.12.0";
 
     src = pkgs.fetchurl {
       url = "mirror://pypi/C/ConfigArgParse/ConfigArgParse-${version}.tar.gz";
-      sha256 = "0a984pvv7370yz7zbkl6s6i7yyl9myahx0m9jkjvg3hz5q8mf70l";
+      sha256 = "0fgkiqh6r3rbkdq3k8c48m85g52k96686rw3a6jg4lcncrkpvk98";
     };
 
     # no tests in tarball

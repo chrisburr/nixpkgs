@@ -21307,13 +21307,26 @@ in {
       sha256 = "0876797aeb633be7129ac943d9ff5643d491f9115a19484cbe8594c3e87912e5";
     };
 
-    buildInputs = with self; [
+    propagatedBuildInputs = with self; [
       self.wrapt
       self.requests
       self.ratelimiter
       self.pyyaml
       self.ConfigArgParse
       self.appdirs
+
+      self.pytools
+      # self.rpy2
+      self.httpretty
+      self.docutils
+      self.nose
+      self.boto3
+      self.moto
+      # self.ftputil
+      self.pysftp
+      self.dropbox
+      self.pyyaml
+      # self.google-cloud-storage
     ];
 
     meta = {

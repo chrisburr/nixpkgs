@@ -54,6 +54,7 @@ stdenv.mkDerivation rec {
     "-Dhdfs=OFF"
     "-Dkrb5=OFF"
     "-Dldap=ON"
+    "-Dminuit2=ON"
     "-Dmonalisa=OFF"
     "-Dmysql=ON"
     "-Dodbc=OFF"

@@ -63,6 +63,7 @@ stdenv.mkDerivation rec {
     "-Dpythia6=OFF"
     "-Dpythia8=OFF"
     "-Drfio=OFF"
+    "-Droofit=ON"
     "-Dsqlite=ON"
     "-Dssl=ON"
     "-Dxml=ON"
